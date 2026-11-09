@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getComparableSales } from "@/lib/auctions";
-import { calculateOffer } from "@/lib/offer";
+import { calculateOffer, OFFER_RULES } from "@/lib/offer";
 import { saveLead, toLead } from "@/lib/leads";
 import { validateOfferInput } from "@/lib/validate";
 import { clientIp, hit } from "@/lib/rate-limit";
@@ -35,16 +35,18 @@ export async function POST(request: Request) {
   const input = check.data;
 
   try {
-    const prices = await getComparableSales(input.year, input.make, input.model);
-    if (prices.length === 0) {
-      // Rare car, no comparable sales: keep the lead, a person prices it by phone.
+    const { prices, mileageFrom, mileageTo } = await getComparableSales(
+      input.year, input.make, input.model, input.mileage,
+    );
+    if (prices.length < OFFER_RULES.minComparables) {
+      // Rare car, too few similar sales: keep the lead, a person prices it by phone.
       const noData = { offer: 0, comparablesCount: 0, priceLow: 0, priceHigh: 0, median: 0 };
       await saveLead(toLead(input, noData));
       return NextResponse.json({ ...noData, needsReview: true });
     }
     const result = calculateOffer(prices, input.condition, input.titleStatus);
     await saveLead(toLead(input, result));
-    return NextResponse.json(result);
+    return NextResponse.json({ ...result, mileageFrom, mileageTo });
   } catch (err) {
     console.error("offer failed", err); // full detail stays in the server log
     return NextResponse.json({ error: "We couldn't calculate an offer right now. Please try again." }, { status: 500 });

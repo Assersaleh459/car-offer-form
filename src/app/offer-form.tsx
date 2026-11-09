@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
-import { CONDITIONS, TITLE_STATUSES, type OfferResult } from "@/lib/offer";
+import { CONDITIONS, TITLE_STATUSES, type MileageRange, type OfferResult } from "@/lib/offer";
 import { isArizonaZip, MAX_YEAR, MIN_YEAR, validateOfferInput, type FieldErrors, type OfferInput } from "@/lib/validate";
 
 type Field = keyof OfferInput;
@@ -54,7 +54,7 @@ export function OfferForm() {
   const [sending, setSending] = useState(false);
   const [consent, setConsent] = useState(false);
   const [step, setStep] = useState<1 | 2>(1);
-  const [result, setResult] = useState<(OfferResult & { needsReview?: boolean }) | null>(null);
+  const [result, setResult] = useState<(OfferResult & Partial<MileageRange> & { needsReview?: boolean }) | null>(null);
 
   // After a step change or an error, move keyboard and screen-reader focus to the right place.
   const pendingFocus = useRef<string | null>(null);
@@ -191,8 +191,10 @@ export function OfferForm() {
         <div className="mt-6 rounded-xl bg-soft p-4 text-sm text-ink">
           <p className="font-semibold">How we calculated this</p>
           <p className="mt-1">
-            We looked at {result.comparablesCount} recent auction sales of similar cars ({usd(result.priceLow)} to{" "}
-            {usd(result.priceHigh)}), took the middle price, and adjusted it for condition and title status.
+            We looked at {result.comparablesCount} recent auction sales of {values.year} {values.make} {values.model}{" "}
+            cars with a clean title, little or no damage and {result.mileageFrom?.toLocaleString("en-US")} to{" "}
+            {result.mileageTo?.toLocaleString("en-US")} miles ({usd(result.priceLow)} to {usd(result.priceHigh)}). We took the middle price and adjusted it for
+            condition and title status.
           </p>
         </div>
 

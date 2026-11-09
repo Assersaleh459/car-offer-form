@@ -8,15 +8,16 @@ Desert Auto Buyers is a fictional business. This is a demo.
 
 All rules are in one place: `OFFER_RULES` in [`src/lib/offer.ts`](src/lib/offer.ts).
 
-1. Get 8 to 12 recent auction sale prices for the same year, make and model (`src/lib/auctions.ts`; mock data for now).
-2. Take the median (middle) price.
-3. Multiply by the condition factor: Excellent 1.0, Good 0.9, Fair 0.75, Poor 0.55.
-4. Multiply by 0.6 if the title is Salvage or Rebuilt.
-5. Take off a 15% margin and round down to the nearest $50.
+1. Find recent auction sales of the same year, make and model (`src/lib/auctions.ts`; mock data for now). Only sales with a **clean title** and **light or no damage** count, because Copart and IAAI sell many damaged cars.
+2. Mileage: first use sales within ±30,000 miles of the seller's car. If there are fewer than 3, try ±60,000 miles. There is no "any mileage" step, so a very unusual car (for example 400,000 miles) is priced by a person, not given a wrong instant offer.
+3. Take the median (middle) price.
+4. Multiply by the condition factor: Excellent 1.0, Good 0.9, Fair 0.75, Poor 0.55.
+5. Multiply by 0.6 if the title is Salvage or Rebuilt.
+6. Take off a 15% margin and round down to the nearest $50.
 
 Example: median $12,810, Good, Clean → 12,810 × 0.9 × 0.85 = $9,799 → **$9,750**.
 
-If no comparable sales are found, the lead is still saved and the seller is told we'll call with an offer.
+If fewer than 3 similar sales are found, the lead is still saved and the seller is told we'll call with an offer.
 
 ## Run it locally
 
@@ -57,6 +58,6 @@ Locally, without `DATABASE_URL`, leads are saved to `data/leads.json`.
 ## Going live (for a real business)
 
 - **Comparable data:** AuctionsAPI is not an official Copart/IAAI API. Before going live, ask them for the monthly price, the request limit, and whether showing derived prices on a public website is allowed.
-- **Salvage prices:** Copart and IAAI are mostly insurance/salvage auctions. Their prices are lower than retail. The formula and filters (for example, clean-title sales only) should be agreed with the business.
-- **Mileage** is saved with each lead but does not change the offer yet.
+- **Auction prices:** Copart and IAAI are mostly insurance/salvage auctions, so even clean-title prices there are below retail. Check the offers against real data with the business and tune the factors and margin in `OFFER_RULES`.
+- **Damage filter:** which damage types count as "light" (`LIGHT_DAMAGE` in `src/lib/auctions.ts`) must be checked against a real API response.
 - **Phone/SMS contact:** check the consent wording with the business's legal adviser (TCPA).

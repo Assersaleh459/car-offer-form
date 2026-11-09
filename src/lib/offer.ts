@@ -9,6 +9,10 @@ export const OFFER_RULES = {
   brandedTitleFactor: 0.6, // applied when the title is Salvage or Rebuilt
   margin: 0.15, // our margin, taken off the adjusted price
   roundDownTo: 50, // final offer is rounded down to this many dollars
+  minComparables: 3, // fewer similar sales than this: no instant offer, we call the seller
+  // Similar sales are searched within this many miles of the seller's car, widest last.
+  // No "any mileage" step: it priced very high-mileage cars like average ones.
+  mileageBands: [30_000, 60_000],
 } as const;
 
 export const CONDITIONS = ["Excellent", "Good", "Fair", "Poor"] as const;
@@ -24,6 +28,23 @@ export type OfferResult = {
   median: number;
 };
 
+export type MileageRange = { mileageFrom: number; mileageTo: number };
+
+// Find similar sales: try ±30,000 mi around the seller's mileage first, then wider,
+// and stop at the first search that finds enough sales.
+export async function findComparables(
+  mileage: number,
+  fetchPrices: (range: MileageRange) => Promise<number[]>,
+): Promise<{ prices: number[] } & MileageRange> {
+  let found: { prices: number[] } & MileageRange = { prices: [], mileageFrom: 0, mileageTo: 0 };
+  for (const band of OFFER_RULES.mileageBands) {
+    const range = { mileageFrom: Math.max(0, mileage - band), mileageTo: mileage + band };
+    found = { prices: await fetchPrices(range), ...range };
+    if (found.prices.length >= OFFER_RULES.minComparables) break;
+  }
+  return found;
+}
+
 export function median(values: number[]): number {
   const sorted = [...values].sort((a, b) => a - b);
   const mid = Math.floor(sorted.length / 2);
@@ -37,7 +58,7 @@ export function calculateOffer(
   condition: Condition,
   titleStatus: TitleStatus,
 ): OfferResult {
-  if (salePrices.length === 0) throw new Error("No comparable sales");
+  if (salePrices.length < OFFER_RULES.minComparables) throw new Error("Too few comparable sales");
 
   const mid = median(salePrices);
   const titleFactor = titleStatus === "Clean" ? 1 : OFFER_RULES.brandedTitleFactor;

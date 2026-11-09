@@ -14,6 +14,8 @@ test("the three plan cars give offers that go down in order", async ({ page }) =
   const excellent = await submitCar(page, "Excellent", "Clean");
   await expect(page.getByText("How we calculated this")).toBeVisible();
   await expect(page.getByText(/Based on \d+ recent sales/)).toBeVisible();
+  // 80,000 mi seller → similar sales from 50,000 to 110,000 mi (±30,000)
+  await expect(page.getByText(/2018 Toyota Camry cars with a clean title, little or no damage and 50,000 to 110,000 miles/)).toBeVisible();
   await expect(page.getByText(/We'll call you within 1 hour at \(602\) 555-0123/)).toBeVisible();
 
   const fair = await submitCar(page, "Fair", "Clean");

@@ -1,13 +1,83 @@
 @import "tailwindcss";
 
+/* Colour tokens (palette A: trust blue). Every colour in the app comes from here, so a client can
+   re-brand by editing this block. Light is the default; dark follows the device setting.
+   Contrast checked: body and muted text >= 4.5:1, button text >= 4.5:1, field borders >= 3:1. */
+:root {
+  color-scheme: light dark;
+  --page: #f6f8fc;
+  --surface: #ffffff;
+  --ink: #0f1b33;
+  --muted: #4b5a74;
+  --line: #d5dcea; /* decorative dividers and card edges */
+  --field: #7d8aa5; /* borders of inputs and checkboxes (needs 3:1) */
+  --brand: #1d4ed8;
+  --brand-hover: #1e40af;
+  --brand-ink: #ffffff;
+  --soft: #e8efff;
+  --good: #166534;
+  --good-soft: #e6f4ea;
+  --bad: #b3261e;
+  --bad-soft: #fde7e6;
+  --notice: #fff4d6;
+  --notice-ink: #7a4b00;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --page: #0b1220;
+    --surface: #121b2e;
+    --ink: #e8eefc;
+    --muted: #9fb0cf;
+    --line: #26334d;
+    --field: #62749a;
+    --brand: #6b93ff;
+    --brand-hover: #8aa9ff;
+    --brand-ink: #07122b;
+    --soft: #17264a;
+    --good: #5ed38a;
+    --good-soft: #12301f;
+    --bad: #ff8a83;
+    --bad-soft: #43201f;
+    --notice: #3a2c0b;
+    --notice-ink: #f2c35c;
+  }
+}
+
 @theme inline {
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --color-page: var(--page);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-field: var(--field);
+  --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-ink: var(--brand-ink);
+  --color-soft: var(--soft);
+  --color-good: var(--good);
+  --color-good-soft: var(--good-soft);
+  --color-bad: var(--bad);
+  --color-bad-soft: var(--bad-soft);
+  --color-notice: var(--notice);
+  --color-notice-ink: var(--notice-ink);
 }
 
 body {
-  background: var(--color-stone-50);
-  color: var(--color-stone-900);
+  background: var(--page);
+  color: var(--ink);
+}
+
+/* One strong focus ring everywhere (both reference apps do the same). */
+:focus-visible {
+  outline: 3px solid var(--brand);
+  outline-offset: 2px;
+}
+/* Headings that get focus after a step change: no ring, they are not controls. */
+[tabindex="-1"]:focus {
+  outline: none;
 }
 
 @keyframes rise {

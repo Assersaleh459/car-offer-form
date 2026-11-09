@@ -77,7 +77,7 @@ async function AdminContent() {
     ) : (
       <>
         <span className="font-semibold text-ink">{usd(l.offer)}</span>
-        <span className="block text-sm font-normal text-muted">
+        <span className="block whitespace-nowrap text-sm font-normal text-muted">
           {l.comparablesCount} comps, {usd(l.priceLow)}–{usd(l.priceHigh)}
         </span>
       </>
@@ -113,10 +113,10 @@ async function AdminContent() {
         <>
           {/* Wide screens: a table with a sticky header. */}
           <div className="mt-6 hidden max-h-[70vh] overflow-auto rounded-2xl border border-line bg-surface md:block">
-            <table className="w-full min-w-[900px] text-left text-sm">
+            <table className="w-full min-w-[720px] text-left text-sm">
               <thead className="sticky top-0 z-10 bg-soft text-sm text-muted">
                 <tr>
-                  {["Received", "Car", "Miles", "Condition", "Title", "ZIP", "Name", "Phone", "Email", "Offer"].map((h) => (
+                  {["Received", "Car", "Condition / title", "Seller", "Offer"].map((h) => (
                     <th key={h} scope="col" className="px-4 py-3 font-semibold">{h}</th>
                   ))}
                 </tr>
@@ -125,16 +125,21 @@ async function AdminContent() {
                 {leads.map((l, i) => (
                   <tr key={`${l.createdAt}-${i}`} className="align-top transition-colors hover:bg-soft/60">
                     <td className="whitespace-nowrap px-4 py-3 text-muted">{when(l.createdAt)}</td>
-                    <td className="px-4 py-3 font-semibold text-ink">{l.year} {l.make} {l.model}</td>
-                    <td className="px-4 py-3 tabular-nums">{l.mileage.toLocaleString("en-US")}</td>
-                    <td className="px-4 py-3"><Pill tone={conditionTone(l.condition)}>{l.condition}</Pill></td>
-                    <td className="px-4 py-3"><Pill tone={titleTone(l.titleStatus)}>{l.titleStatus}</Pill></td>
-                    <td className="px-4 py-3 tabular-nums">{l.zip}</td>
-                    <td className="px-4 py-3">{l.name}</td>
-                    <td className="whitespace-nowrap px-4 py-3 tabular-nums">
-                      <a className={link} href={`tel:+1${l.phone}`}>{phone(l.phone)}</a>
+                    <td className="px-4 py-3">
+                      <span className="block whitespace-nowrap font-semibold text-ink">{l.year} {l.make} {l.model}</span>
+                      <span className="block whitespace-nowrap text-muted">{l.mileage.toLocaleString("en-US")} mi · ZIP {l.zip}</span>
                     </td>
-                    <td className="px-4 py-3"><a className={link} href={`mailto:${l.email}`}>{l.email}</a></td>
+                    <td className="px-4 py-3">
+                      <div className="flex flex-col items-start gap-1">
+                        <Pill tone={conditionTone(l.condition)}>{l.condition}</Pill>
+                        <Pill tone={titleTone(l.titleStatus)}>{l.titleStatus}</Pill>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className="block font-medium text-ink">{l.name}</span>
+                      <a className={`${link} block whitespace-nowrap tabular-nums`} href={`tel:+1${l.phone}`}>{phone(l.phone)}</a>
+                      <a className={`${link} block break-all`} href={`mailto:${l.email}`}>{l.email}</a>
+                    </td>
                     <td className="whitespace-nowrap px-4 py-3 tabular-nums">{offerCell(l)}</td>
                   </tr>
                 ))}

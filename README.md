@@ -4,6 +4,32 @@ A one-page site where a seller enters their car and contact details and gets an 
 
 Desert Auto Buyers is a fictional business. This is a demo.
 
+## Screenshots
+
+All data in these images is fake. The comparable sales are mock data until a real auction API key is connected.
+
+| Step 1: the car | Step 2: contact details |
+|---|---|
+| ![Step 1](docs/form-step1.png) | ![Step 2](docs/form-step2.png) |
+
+**The offer, with a short explanation of how it was calculated**
+
+![Offer result](docs/offer-result.png)
+
+**Same car, Poor condition and Salvage title: a lower offer, calculated by the same rules**
+
+![Salvage offer](docs/offer-salvage.png)
+
+**Admin page** (password-protected): leads newest first, with the offer and the number of comparable sales used.
+
+![Admin leads](docs/admin-leads.png)
+
+**Mobile and dark mode**
+
+| Mobile form | Mobile result | Dark mode |
+|---|---|---|
+| ![Mobile form](docs/mobile-form.png) | ![Mobile result](docs/mobile-result.png) | ![Dark mode](docs/offer-dark.png) |
+
 ## How the offer is calculated
 
 All rules are in one place: `OFFER_RULES` in [`src/lib/offer.ts`](src/lib/offer.ts).
